@@ -80,18 +80,20 @@ Any other input -> Search for members by their name
     search_term = inquirer.text(message="Input")
     matching_results = [member for member in members_array[1:] if search_term.lower() in member[0].lower()]
 
-    # Display matching results and allow user to select attendees
-    attendee_choices = [(f"{i + 1}. {result[0]}", result[0]) for i, result in enumerate(matching_results)]
-    if attendee_choices == []:
-        print(f"No one with the name '{search_term}' was found")
-    else:
-        selection = inquirer.list_input("Select attendee", choices=attendee_choices)
-        students_attended.append(selection)
-
     if search_term == "2":
         break
     if search_term == "1" and len(students_attended)>0:
             del students_attended[-1]
+    # Display matching results and allow user to select attendees
+    attendee_choices = [(f"{i + 1}. {result[0]}", result[0]) for i, result in enumerate(matching_results)]
+    if attendee_choices != []:
+        selection = inquirer.list_input("Select attendee", choices=attendee_choices)
+        if selection not in students_attended:
+            students_attended.append(selection)
+
+for student in students_attended:
+    print(np.where(members_array == student))
+    members_array[np.where(members_array == student)[0],4]=1
 
 for row in members_array:
     output.append(row.tolist())
