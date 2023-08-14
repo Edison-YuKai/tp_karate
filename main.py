@@ -188,9 +188,12 @@ match(menu):
             # Iterate through the inner dictionary
             for inner_key, inner_value in inner_dict.items():
                 row.append(inner_value)
-            row.append(row[2]/total_trainings_dict['Tuesday'])
-            row.append((row[2] + row[4])/(total_trainings_dict['Tuesday']+total_trainings_dict['Thursday']))
-            row.append((row[2] + row[4]+ row[6])/(total_trainings_dict['Tuesday']+total_trainings_dict['Thursday']+total_trainings_dict['Saturday']))
+            if total_trainings_dict['Tuesday']!=0:
+                row.append(row[2]/total_trainings_dict['Tuesday'])
+            if total_trainings_dict['Tuesday']+total_trainings_dict['Thursday']!=0:
+                row.append((row[2] + row[4])/(total_trainings_dict['Tuesday']+total_trainings_dict['Thursday']))
+            if total_trainings_dict['Tuesday']+total_trainings_dict['Thursday']+total_trainings_dict['Saturday'] != 0:
+                row.append((row[2] + row[4]+ row[6])/(total_trainings_dict['Tuesday']+total_trainings_dict['Thursday']+total_trainings_dict['Saturday']))
             output.append(row)
         print(0/1)
         # Specify the directory path and file name
