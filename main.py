@@ -62,8 +62,7 @@ while True:
         print("Invalid date given")
 
 output = []
-output.append(["Venue", venue])
-output.append(["Date", date])
+output.extend([["Venue", venue],[],["Date", date],[]])
 
 students_attended = []
 
