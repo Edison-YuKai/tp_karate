@@ -2,7 +2,7 @@ from time import sleep
 import numpy as np
 import inquirer
 import csv
-import datetime
+from datetime import datetime
 from inquirer import errors
 from os import name, system
 
@@ -49,13 +49,14 @@ def validate_year(answers, current):
         raise errors.ValidationError('', reason='Only numbers allowed.')
 
 while True:
-    year = inquirer.text(message="Year", validate=validate_year)
+    year = inquirer.text(message="Year", validate=validate_year, default='2023')
     month = inquirer.list_input("Select month",
                     choices=[('January',1 ), ('February',2), ('March',3), ('April',4), ('May',5), ('June',6), ('July',7), ('August',8) , ('September',9), ('October',10), ('November',11), ('December',12)],
-                    carousel=True,)
-    day = inquirer.text(message="Day", validate=validate_day)
+                    carousel=True,
+                    default=int(datetime.today().strftime('%m')))
+    day = inquirer.text(message="Day", validate=validate_day, default=int(datetime.today().strftime('%d')))
     try:
-        datetime.datetime(year=int(year),month=int(month),day=int(day))
+        datetime(year=int(year),month=int(month),day=int(day))
         date = str(day) + '/' + str(month) + '/' + str(year)
         break
     except ValueError:
@@ -97,7 +98,6 @@ for student in students_attended:
 for row in members_array:
     output.append(row.tolist())
 
-print(output)
 with open('output.csv', 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerows(output)
