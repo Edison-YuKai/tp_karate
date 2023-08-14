@@ -49,7 +49,7 @@ def validate_year(answers, current):
         raise errors.ValidationError('', reason='Only numbers allowed.')
 
 while True:
-    year = inquirer.text(message="Year", validate=validate_year, default='2023')
+    year = inquirer.text(message="Year", validate=validate_year, default=int(datetime.today().strftime('%Y')))
     month = inquirer.list_input("Select month",
                     choices=[('January',1 ), ('February',2), ('March',3), ('April',4), ('May',5), ('June',6), ('July',7), ('August',8) , ('September',9), ('October',10), ('November',11), ('December',12)],
                     carousel=True,
