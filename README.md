@@ -4,22 +4,20 @@ MVP: a python program to help mark training attendance
 1. this program will accept these CSV files:
 
 - members.csv (csv file containing data on karate members)
-    - fields:
-        - full name
-        - seniority (trials, freshman, junior, senior)
 
 - venues.csv (csv file containing the training venues)
-    - fields:
-        - venue name
 
-2. read these files and then turn them into numpy arrays
+2. create attendance sheets under /attendance
 
-3. prompt the user to:
-    - select venue
-    - input date (with input validation)
+3. create stats sheet under /stats
+    - attendance % for tuesdays
+    - attendance % for tuesdays, thursdays
+    - attendance % for tuesdays, thursdays, saturdays
 
-4. ask the user to continually select the members attending this current training.
+## Areas for improvement
 
-    as the user types, the matching options will be displayed, of which the user can select (arrow keys to select, enter to confirm)
-
-5. after user has selected all the members, output a csv file containing the fully furnished attendance list for that training in csv format
+- error handling (making a stats file when there is no attendance sheets)
+- stats sheet display %
+- dynamic stats (dont display day fields with 0 trainings on them)
+- generate a html file from display stats sheet and auto-open html file
+- be able to generate stats for a custom period of time (1 term, 1 sem, trials period, etc.)
