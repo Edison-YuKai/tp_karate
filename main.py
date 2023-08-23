@@ -122,12 +122,11 @@ match(menu):
             writer.writerows(output)
     case(2):
         print(f"You selected: {stats_string}")
+        
         # Specify the directory path
         directory = "attendance"
-
         # List all files in the directory
         file_list = os.listdir(directory)
-
         # Filter only CSV files
         csv_files = [file for file in file_list if file.endswith('.csv')]
 
@@ -136,66 +135,69 @@ match(menu):
         for csv_file in csv_files:
             filepath = os.path.join(directory, csv_file)
             big_list.append(load_csv_data(filepath))
-        
-        total_trainings_dict = {
-                "Monday": 0,
-                "Tuesday": 0,
-                "Wednesday": 0,
-                "Thursday": 0,
-                "Friday": 0,
-                "Saturday": 0,
-                "Sunday": 0
-        }
-        members_attendance_dict = {}
-
         members_array = load_csv_data('members.csv')[1:]
-
+        
+        members_attendance_dict = {}
         for member in members_array:
-            members_attendance_dict[member[0]]={
-                "Monday": 0,
-                "Tuesday": 0,
-                "Wednesday": 0,
-                "Thursday": 0,
-                "Friday": 0,
-                "Saturday": 0,
-                "Sunday": 0
-            }
+            members_attendance_dict[member[0]]={}
 
 
-        for list in big_list:
+        total_trainings_dict = {}
+        for nested_list in big_list:
 
-            date_parts = list[2][1].split("/")  # Split the date string into day, month, and year parts
+            date_parts = nested_list[2][1].split("/")  # Split the date string into day, month, and year parts
             day, month, year = int(date_parts[0]),int(date_parts[1]),int(date_parts[2])
-            date = datetime(year=year, month=month, day=day)
-
-            # Get the day of the week (0 = Monday, 6 = Sunday)
-            day_of_week = date.weekday()
+            day_of_week = datetime(year=year, month=month, day=day).strftime('%A')
             
-            # Define a list of day names
-            days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-            
-            total_trainings_dict[days[day_of_week]] += 1
-            
-            for row in np.array(list[5:]):
+            if day_of_week in total_trainings_dict:
+                total_trainings_dict[day_of_week] += 1
+            else:
+                total_trainings_dict[day_of_week] = 1
+                        
+            for row in np.array(nested_list[5:]):
                 if row[-1]=='1':
-                    members_attendance_dict[row[0]][days[day_of_week]] += 1
+                    if day_of_week in members_attendance_dict:
+                        members_attendance_dict[row[0]][day_of_week] += 1
+                    else:
+                        members_attendance_dict[row[0]][day_of_week] = 1
 
-        output = [["Full Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday","Tues%","TuesThurs%", "All%"]]
+        output,first_row = [],["Full Name", "Tues%","TuesThurs%", "All%"]
+        pos=1
+        for i in range(len(total_trainings_dict.keys())):
+            first_row.insert(i + pos, list(total_trainings_dict.keys())[i])
+        output.append(first_row)
         # Iterate through the outer dictionary
-        for outer_key, inner_dict in members_attendance_dict.items():
+        for member_name, trainings in members_attendance_dict.items():
+            tuesdays,thursdays,saturdays = 0,0,0
             row = []
-            row.append(outer_key)
+            row.append(member_name)
+            print(member_name,trainings)
             # Iterate through the inner dictionary
-            for inner_key, inner_value in inner_dict.items():
-                row.append(inner_value)
-            if total_trainings_dict['Tuesday']!=0:
-                row.append(row[2]/total_trainings_dict['Tuesday'])
-            if total_trainings_dict['Tuesday']+total_trainings_dict['Thursday']!=0:
-                row.append((row[2] + row[4])/(total_trainings_dict['Tuesday']+total_trainings_dict['Thursday']))
-            if total_trainings_dict['Tuesday']+total_trainings_dict['Thursday']+total_trainings_dict['Saturday'] != 0:
-                row.append((row[2] + row[4]+ row[6])/(total_trainings_dict['Tuesday']+total_trainings_dict['Thursday']+total_trainings_dict['Saturday']))
+            for day, days_attended in trainings.items():
+                row.append(days_attended)
+                if day == 'Tuesday':
+                    tuesdays += days_attended
+                if day == 'Thursday':
+                    thursdays += days_attended
+                if day == 'Saturday':
+                    saturdays += days_attended
+            tues_pct, tuesthurs_pct, tuesthurssat_pct = 0,0,0
+            if total_trainings_dict.get('Tuesday') == 0:
+                tues_pct = 'N/A'
+            else:
+                tues_pct = tuesdays/total_trainings_dict.get('Tuesday')
+            if total_trainings_dict.get('Tuesday') == 0 and total_trainings_dict.get('Thursday') == 0:
+                tuesthurs_pct = 'N/A'
+            elif total_trainings_dict.get('Thursday') != None or total_trainings_dict.get('Tuesday') != None:
+                tuesthurs_pct = (tuesdays+thursdays)/(total_trainings_dict.get('Tuesday',0)+total_trainings_dict.get('Thursday',0))
+            if total_trainings_dict.get('Tuesday') == 0 and total_trainings_dict.get('Thursday') == 0 and total_trainings_dict.get('Saturday') == 0:
+                tuesthurssat_pct = 'N/A'
+            elif total_trainings_dict.get('Tuesday') != None or total_trainings_dict.get('Tuesday') != None or total_trainings_dict.get('Saturday') != None:
+                tuesthurssat_pct = (tuesdays+thursdays+saturdays)/(total_trainings_dict.get('Tuesday',0)+total_trainings_dict.get('Thursday',0)+total_trainings_dict.get('Saturday',0))
+            print([tues_pct,tuesthurs_pct,tuesthurssat_pct])
+            row.extend([tues_pct,tuesthurs_pct,tuesthurssat_pct])
             output.append(row)
-        print(0/1)
+
         # Specify the directory path and file name
         directory = "stats"
         filename = 'stats.csv'  # Using a hyphen as separator
